@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -44,6 +45,7 @@ func main(){
 	}
 	// fmt.Println("Server is running on port:", port)
 
+	go startScraper(apiCfg.DB, 10, time.Minute)
 
 	router := chi.NewRouter()
 
@@ -62,6 +64,10 @@ func main(){
 	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.getUserByAPIKey))
 	v1Router.Get("/feeds", apiCfg.getFeedsHandler)
 	v1Router.Post("/feed", apiCfg.middlewareAuth(apiCfg.createFeedHandler))
+	v1Router.Post("/feedFollowUser", apiCfg.middlewareAuth(apiCfg.createFeedFollowUserHandler))
+	v1Router.Get("/feedsFollowUser", apiCfg.middlewareAuth(apiCfg.getFeedsFollowUserHandler))
+	v1Router.Get("/postsForUser", apiCfg.middlewareAuth(apiCfg.getPostForUserHandler))
+	v1Router.Delete("/feedFollowUser/{feedFollowUserID}", apiCfg.middlewareAuth(apiCfg.deleteFeedFollowUserHandler))
 	v1Router.NotFound(pathNotFoundError)
 
 

@@ -39,3 +39,29 @@ func (apiCfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Reques
 func (apiCfg *apiConfig) getUserByAPIKey(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, http.StatusOK, dataBaseUserToUser(user))
 }
+
+
+// type GetPostForUserParams struct {
+// 	UserID uuid.UUID
+// 	Limit  int32
+// }
+
+
+func (apiCfg *apiConfig) getPostForUserHandler(w http.ResponseWriter, r *http.Request, user database.User) {
+
+	posts, err := apiCfg.DB.GetPostForUser(r.Context(), database.GetPostForUserParams{
+		UserID: user.ID,
+		Limit:  10,
+	})
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Error fetching posts for user")
+		return
+	}
+
+	postsResponse := make([]Post, len(posts))
+	for i, post := range posts {
+		postsResponse[i] = dataBasePostToPost(post)
+	respondWithJSON(w, http.StatusOK, dataBaseUserToUser(user))
+	}
+}
